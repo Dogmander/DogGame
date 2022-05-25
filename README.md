@@ -1,2 +1,2 @@
 # DogGame
-pygame
+WIP dog simulator
