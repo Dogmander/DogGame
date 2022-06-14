@@ -8,5 +8,8 @@ class Player(Actor):
         gltf.patch_loader(loader)
         # Load the player model and initialize Actor class
         super().__init__("game/assets/models/ShibaInu.gltf")
+        self.setHpr(180, 0, 0)
         # Reparent the model to render
         self.reparentTo(render)
+        
+        
