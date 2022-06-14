@@ -9,37 +9,58 @@ from panda3d.core import loadPrcFileData
 from panda3d.core import loadPrcFile
 #loadPrcFileData("", "want-directtools #t")
 #loadPrcFileData("", "want-tk #t")
-loadPrcFile(Filename.expand_from('$MAIN_DIR/Config.prc'))
-
+#loadPrcFile(Filename.expand_from('$MAIN_DIR/Config.prc'))
+loadPrcFile('Config.prc')
 
 class Main(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
+    
+        # Disables camera control via mouse (this is required for the camera position to be able to be adjusted in the code)
         #self.disableMouse()
         
         # Create level
         self.scene = Level()
+        self.camera.setPos(0, -15, 1.5)
+        
+        # Log camera position
+        taskMgr.add(self.camera_pos, "camera_pos_task")
+        taskMgr.add(self.player_pos, "player_pos_task")
         
         # Create players
         self.player = Player()
         self.player2 = Player()
         
+        # Move second player to the right so it doesn't clip into first player
         self.player2.setPos(2, 0, 0)
         
+        # Animations for testing
         self.player.loop("Walk")
         self.player2.loop("Gallop")
-        # Apply scale and position transforms on the model.
-        #self.scene.setScale(0.25, 0.25, 0.25)
-        #self.scene.setPos(-8, 42, 0)
+        
+        # Add temporary lights, these will be replaced when I figure out better lighting    
         dlight = DirectionalLight('my dlight')
         dlnp = self.render.attachNewNode(dlight)
-        
         dlight.setColor((1, 1, 1, 1))
-        dlnp.setHpr(0, -60, 0)
-        dlnp.setPos(0, 20, 0)
-        
+        dlnp.setHpr(0, -5, 0)
         self.render.setLight(dlnp)
-        self.textObject = OnscreenText(text="Hello World", pos=(0.5, 0.8), scale=0.1, fg=(1, 0, 0, 1))
-       
+        
+        self.camera_pos_text = OnscreenText(pos=(-0.5, 0.9), scale=0.1, fg=(1, 0, 0, 1))
+        self.player_pos_text = OnscreenText(pos=(-0.5, 0.8), scale=0.1, fg=(1, 0, 0, 1))
+        
+    def camera_pos(self, task):
+        x = str(round(self.camera.getX(), 3))
+        y = str(round(self.camera.getY(), 3))
+        z = str(round(self.camera.getZ(), 3))
+        
+        self.camera_pos_text.setText((f"Camera position: x{x} y{y} z{z}"))
+        return Task.cont
+    def player_pos(self, task):
+        x = str(round(self.player.getX(), 3))
+        y = str(round(self.player.getY(), 3))
+        z = str(round(self.player.getZ(), 3))
+        
+        self.player_pos_text.setText((f"Player position: x{x} y{y} z{z}"))
+        return Task.cont
 main = Main()
 main.run()
