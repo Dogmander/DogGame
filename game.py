@@ -84,16 +84,19 @@ class Main(ShowBase):
    
     
         self.physics.touchingGround = False
-        taskMgr.add(base.physics.gravity, "gravity_task")
+        #taskMgr.add(base.physics.gravity, "gravity_task")
         self.playerPusher.addInPattern('player-into-pnode')
         #taskMgr.add(base.player.physics, "physics")
         #self.accept('player-into-pnode', self.hitGround)
         self.accept('player-into-pnode', self.physics.hitGround)
-        self.accept('player-into-pnode', print, ["player-into-pnode"])
-        self.accept('g', self.player.setZ, [5])
-        self.accept('t', print, [self.physics.touchingGround, self.physics.current_speed, self.physics.hitGround('player-into-pnode')])
+
+        
+        taskMgr.add(self.falsify, "falsify_task", sort=29)
     
-       
+    def falsify(self, task):
+        self.physics.touchingGround = False
+        
+        return Task.cont   
     
     def hitGround(self, entry):
         print("touching ground")
@@ -122,6 +125,7 @@ class Main(ShowBase):
     def speed_text(self, task):
         speed = str(round(self.physics.current_speed, 3))
         self.player_speed_text.setText((f"Player speed: {speed}"))
+        print(self.physics.touchingGround)
         return Task.cont
     
 main = Main()

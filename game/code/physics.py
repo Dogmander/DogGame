@@ -7,12 +7,12 @@ class Physics:
         self.current_speed = 0
         self.dt = ClockObject.getGlobalClock().getDt()
         self.falling_speed = 2 * self.dt 
-        self.touchingGround = False
+        #self.touchingGround = False
         
     def hitGround(self, entry):
         self.touchingGround = True
         if self.touchingGround:
-            self.touchingGround = False
+            
             self.current_speed = 0
         else:
             
