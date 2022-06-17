@@ -15,9 +15,15 @@ class Player(Actor):
         # Reparent the model to render
         self.reparentTo(render)
         
+        
+
+    '''
     def physics(self, task):
         dt = ClockObject.getGlobalClock().getDt()
-        gravity = 15 * dt
-        self.setZ(self, -gravity)
+        gravity = 5 * dt
+        self.speed += gravity
+        self.setZ(self, -self.speed)
+        if base.physics.touchingGround:
+            self.speed = 0
         return Task.cont
-    
+    '''

@@ -1,13 +1,15 @@
+# Import depenedencies
 from panda3d.core import ClockObject
 from direct.task import Task
 from .controls import Input
-from random import randrange
 
 class Movement:
     def __init__(self):
+        
         self.input = Input()
         self.keyMap = self.input.keyMap
         self.isMoving = self.input.isMoving
+        
     def move(self, task):
         dt = ClockObject.getGlobalClock().getDt()
         
@@ -19,8 +21,13 @@ class Movement:
             base.player.setY(base.player, - dt * 30)
         if self.keyMap["backward"]:
             base.player.setY(base.player, + dt * 15)
-        if self.keyMap["jump"]:
-            base.player.setZ(base.player.getZ() + dt * 15)
+        if self.keyMap["jump"] and base.physics.touchingGround:
+            #base.touchingGround = False
+            base.player.setZ(base.player.getZ() + dt * 100)
+           
+            #base.player.setZ(base.player.getZ() + dt * 30)
+            #base.touchingGround = False
+            #print(ClockObject.getGlobalClock().getRealTime())
         
         if self.keyMap["forward"]:
             if not self.isMoving:
@@ -37,7 +44,8 @@ class Movement:
                 self.isMoving = False
         if self.keyMap["jump"]:
             if not self.isMoving:
-                base.player.loop("Jump")
+                base.player.setPlayRate(0.1, "Jump_ToIdle")
+                base.player.play("Jump_ToIdle")
                 self.isMoving = True
          
         
@@ -47,3 +55,6 @@ class Movement:
             base.player.setH(360)
         return Task.cont
     
+        
+        
+        
