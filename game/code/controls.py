@@ -1,6 +1,6 @@
 from direct.showbase.DirectObject import DirectObject
-from direct.task import Task
-from panda3d.core import ClockObject
+
+
 
 class Input(DirectObject):
     def __init__(self):
@@ -24,37 +24,6 @@ class Input(DirectObject):
         self.keyMap[key] = value
         print(self, key, value)
 
-    def rotation(self, task):
-        dt = ClockObject.getGlobalClock().getDt()
+    
         
-        if self.keyMap["left"]:
-            base.player.setH(base.player.getH() + dt * 60)
-        if self.keyMap["right"]:
-            base.player.setH(base.player.getH() - dt * 60)
-        if self.keyMap["forward"]:
-            base.player.setY(base.player, - dt * 30)
-        if self.keyMap["backward"]:
-            base.player.setY(base.player, + dt * 15)
-        
-        if self.keyMap["forward"]:
-            if not self.isMoving:
-                base.player.loop("Gallop")
-                self.isMoving = True
-        elif self.keyMap["left"] or self.keyMap["right"] or self.keyMap["backward"]:
-            if not self.isMoving:
-                base.player.loop("Walk")
-                self.isMoving = True
-        else:
-            if self.isMoving:
-                base.player.loop("Idle")
-                self.isMoving = False
-    def hello(self):
-        print("Hello")        
-        
-        if base.player.getH() > 360:
-            base.player.setH(0)
-        if base.player.getH() < 0:
-            base.player.setH(360)
-        
-        return Task.cont
     

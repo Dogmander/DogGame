@@ -1,14 +1,30 @@
-from panda3d.core import ClockObject
+from direct.showbase.DirectObject import DirectObject
 from direct.task import Task
-from .controls import Input
-from random import randrange
+from panda3d.core import ClockObject
 
-class Movement:
+class Input(DirectObject):
     def __init__(self):
-        self.input = Input()
-        self.keyMap = self.input.keyMap
-        self.isMoving = self.input.isMoving
-    def move(self, task):
+        self.keyMap = {
+            "left": 0, "right": 0, "forward": 0, "backward": 0}
+        
+        self.isMoving = False
+        self.accept("w", self.setKey, ["forward", True])
+        self.accept("s", self.setKey, ["backward", True])
+        self.accept("a", self.setKey, ["left", True])
+        self.accept("d", self.setKey, ["right", True])
+        self.accept("w-up", self.setKey, ["forward", False])
+        self.accept("s-up", self.setKey, ["backward", False])
+        self.accept("a-up", self.setKey, ["left", False])
+        self.accept("d-up", self.setKey, ["right", False])
+        self.accept("w", self.setKey, ['forward', True])
+        self.accept("h", self.setKey, ['left', True])
+        
+        
+    def setKey(self, key, value):
+        self.keyMap[key] = value
+        print(self, key, value)
+
+    def rotation(self, task):
         dt = ClockObject.getGlobalClock().getDt()
         
         if self.keyMap["left"]:
@@ -30,9 +46,7 @@ class Movement:
                 self.isMoving = True
         else:
             if self.isMoving:
-                base.player.stop()
                 base.player.loop("Idle")
-                
                 self.isMoving = False
          
         
@@ -40,5 +54,6 @@ class Movement:
             base.player.setH(0)
         if base.player.getH() < 0:
             base.player.setH(360)
+        
         return Task.cont
     

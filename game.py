@@ -4,7 +4,9 @@ from direct.task import Task
 from direct.gui.OnscreenText import OnscreenText
 from game.code.player import Player
 from game.code.level import Level
+
 from game.code.controls import Input
+from game.code.movement import Movement
 #from panda3d.core import loadPrcFile
 loadPrcFile('settings.prc')
 
@@ -19,22 +21,23 @@ class Main(ShowBase):
         self.scene = Level()
         self.camera.setPos(0, -15, 1.5)
         self.input = Input()
+        self.movement = Movement()
         # Log camera position
         taskMgr.add(self.camera_pos, "camera_pos_task")
         taskMgr.add(self.player_pos, "player_pos_task")
         
         
-        taskMgr.add(self.input.rotation, "rotation_task")
+        taskMgr.add(self.movement.move, "movement_task")
         
         # Create players
         self.player = Player()
         self.player2 = Player()
-        
+        print(self.player.getAnimNames())
         # Move second player to the right so it doesn't clip into first player
         self.player2.setPos(2, 0, 0)
         
         # Animations for testing
-        #self.player.loop("Walk")
+        #self.player.loop("Idle")
         self.player2.loop("Gallop")
         
         # Add temporary lights, these will be replaced when I figure out better lighting    
