@@ -19,6 +19,8 @@ class Movement:
             base.player.setY(base.player, - dt * 30)
         if self.keyMap["backward"]:
             base.player.setY(base.player, + dt * 15)
+        if self.keyMap["jump"]:
+            base.player.setZ(base.player.getZ() + dt * 15)
         
         if self.keyMap["forward"]:
             if not self.isMoving:
@@ -32,8 +34,11 @@ class Movement:
             if self.isMoving:
                 base.player.stop()
                 base.player.loop("Idle")
-                
                 self.isMoving = False
+        if self.keyMap["jump"]:
+            if not self.isMoving:
+                base.player.loop("Jump")
+                self.isMoving = True
          
         
         if base.player.getH() > 360:

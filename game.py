@@ -7,7 +7,11 @@ from game.code.level import Level
 
 from game.code.controls import Input
 from game.code.movement import Movement
-#from panda3d.core import loadPrcFile
+#from panda3d.core import loadPrcFileData
+#loadPrcFileData("", "want-directtools #t")
+#loadPrcFileData("", "want-tk #t")
+
+
 loadPrcFile('settings.prc')
 
 class Main(ShowBase):
@@ -31,6 +35,7 @@ class Main(ShowBase):
         
         # Create players
         self.player = Player()
+        #self.player.setZ(25)
         self.player2 = Player()
         print(self.player.getAnimNames())
         # Move second player to the right so it doesn't clip into first player
@@ -49,11 +54,65 @@ class Main(ShowBase):
         
         self.camera_pos_text = OnscreenText(pos=(-0.5, 0.9), scale=0.1, fg=(1, 0, 0, 1))
         self.player_pos_text = OnscreenText(pos=(-0.5, 0.8), scale=0.1, fg=(1, 0, 0, 1))
-    
-    
-    
         
-    
+        self.cTrav = CollisionTraverser()
+       
+        
+        self.pnodePath = self.scene.model.attachNewNode(CollisionNode('pnode'))
+        self.pnodePath.show()
+        
+        
+        self.playerCol = CollisionNode('playerCol')
+        self.playerCol.addSolid(CollisionSphere(0, 0, 0, 0.5))
+        self.playerCol.setFromCollideMask(CollideMask.bit(0))
+        self.playerCol.setIntoCollideMask(CollideMask.allOff())
+        self.playerColNp = self.player.attachNewNode(self.playerCol)
+        self.playerPusher = CollisionHandlerPusher()
+        self.playerPusher.horizontal = True
+        self.playerPusher.addCollider(self.playerColNp, self.player)
+        self.cTrav.addCollider(self.playerColNp, self.playerPusher)
+        self.playerColNp.show()
+        print(self.scene.model.getZ())
+        print(self.player.getZ())
+        
+        
+        '''
+        self.capsule = CollisionCapsule(0, -1, 1.5, 0, 1, 1.5, 0.9)
+        self.cnodePath = self.player.attachNewNode(CollisionNode('cnode'))
+        self.cnodePath.node().addSolid(self.capsule)
+        
+        self.cnodePath.show()
+        
+ 
+        
+
+        
+        self.cTrav = CollisionTraverser()
+        self.pusher = CollisionHandlerPusher()
+        colliderNode = CollisionNode("player")
+        
+        colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
+        collider = self.player.attachNewNode(colliderNode)
+        
+        collider.show()
+        
+        self.pusher.addCollider(collider, self.player)
+        
+        self.cTrav.addCollider(collider, self.pusher)
+        
+        self.pusher.setHorizontal(True)
+       '''
+       
+        #taskMgr.add(base.player.physics, "physics_task")
+        self.playerPusher.addInPattern('player-into-pnode')
+        print(self.playerPusher)
+        self.accept('player-into-pnode', self.touchingGround)
+        print(self.playerPusher.getInPattern(0))
+        
+    def touchingGround(self, entry):
+        print("touching ground")
+        print(entry)
+        self.player.setZ(self.scene.model.getZ())
         
     def camera_pos(self, task):
         x = str(round(self.camera.getX(), 3))

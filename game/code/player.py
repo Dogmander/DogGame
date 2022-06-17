@@ -1,5 +1,8 @@
 # Import dependencies
+from panda3d.core import ClockObject
+
 from direct.actor.Actor import Actor
+from direct.task import Task
 import gltf
 
 class Player(Actor):
@@ -12,4 +15,9 @@ class Player(Actor):
         # Reparent the model to render
         self.reparentTo(render)
         
-        
+    def physics(self, task):
+        dt = ClockObject.getGlobalClock().getDt()
+        gravity = 15 * dt
+        self.setZ(self, -gravity)
+        return Task.cont
+    
