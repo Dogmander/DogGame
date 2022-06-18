@@ -1,3 +1,5 @@
+[![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/SPHS3WAnys)
+
 # DogGame
 
 A 3d dog simulator written in Panda3D
