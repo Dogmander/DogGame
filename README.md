@@ -1,6 +1,5 @@
-![Discord](https://img.shields.io/discord/987538220411662376)
-
 # DogGame
+![Discord](https://img.shields.io/discord/987538220411662376)
 
 A 3d dog simulator written in Panda3D
 
