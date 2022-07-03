@@ -1,10 +1,12 @@
+# Import dependencies
+from turtle import left
 from panda3d.core import *
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.gui.OnscreenText import OnscreenText
 from game.code.player import Player
 from game.code.level import Level
-
+from game.code.debug import Debug
 from game.code.controls import Input
 from game.code.movement import Movement
 from game.code.physics import Physics
@@ -12,7 +14,7 @@ from game.code.physics import Physics
 #loadPrcFileData("", "want-directtools #t")
 #loadPrcFileData("", "want-tk #t")
 
-
+# Load settings
 loadPrcFile('settings.prc')
 
 class Main(ShowBase):
@@ -22,24 +24,23 @@ class Main(ShowBase):
         # Disables camera control via mouse (this is required for the camera position to be able to be adjusted in the code)
         #self.disableMouse()
         
+        
+        self.debug = Debug()
         # Create level
         self.scene = Level()
-        self.camera.setPos(0, -15, 1.5)
+        
         #self.input = Input()
         self.movement = Movement()
         self.physics = Physics()
-        # Log camera position
-        taskMgr.add(self.camera_pos, "camera_pos_task")
-        taskMgr.add(self.player_pos, "player_pos_task")
-        taskMgr.add(self.speed_text, "speed_text_task")
+        
         
         taskMgr.add(self.movement.move, "movement_task")
         
         # Create players
         self.player = Player()
-        self.player.setZ(25)
+        self.player.setZ(1)
         self.player2 = Player()
-        print(self.player.getAnimNames())
+        
         # Move second player to the right so it doesn't clip into first player
         self.player2.setPos(2, 0, 0)
         
@@ -51,22 +52,20 @@ class Main(ShowBase):
         dlight = DirectionalLight('my dlight')
         dlnp = self.render.attachNewNode(dlight)
         dlight.setColor((1, 1, 1, 1))
-        dlnp.setHpr(0, -5, 0)
+        dlnp.setHpr(0, 192, 0)
         self.render.setLight(dlnp)
         
-        self.camera_pos_text = OnscreenText(pos=(-0.5, 0.9), scale=0.1, fg=(1, 0, 0, 1))
-        self.player_pos_text = OnscreenText(pos=(-0.5, 0.8), scale=0.1, fg=(1, 0, 0, 1))
-        self.player_speed_text = OnscreenText(pos=(-0.5, 0.7), scale=0.1, fg=(1, 0, 0, 1))
+        
         self.cTrav = CollisionTraverser()
-       
+        
         
         self.pnodePath = self.scene.model.attachNewNode(CollisionNode('pnode'))
         self.pnodePath.node().addSolid(CollisionPolygon(Point3(-10, -10, 0), Point3(10, -10, 0),
                                                         Point3(10, 10, 0), Point3(-10, 10, 0)))
+        
         print(self.scene.model.getTightBounds())
         self.pnodePath.show()
-        
-        
+       
         self.playerCol = CollisionNode('playerCol')
         #self.playerCol.addSolid(CollisionSphere(0, 0, 1, 0.5))
         self.playerCol.addSolid(CollisionSphere(0, -1, 1.2, 1.25))
@@ -81,52 +80,45 @@ class Main(ShowBase):
         self.cTrav.addCollider(self.playerColNp, self.playerPusher)
         self.playerColNp.show()
         self.cTrav.showCollisions(render)
-   
-    
-        self.physics.touchingGround = False
-        #taskMgr.add(base.physics.gravity, "gravity_task")
-        self.playerPusher.addInPattern('player-into-pnode')
-        #taskMgr.add(base.player.physics, "physics")
+        print(self.cTrav.getColliders())
+        
+        taskMgr.add(base.physics.gravity, "gravity_task")
+        #taskMgr.add(self.physics.test, "test")
+        self.playerPusher.addInPattern('player-in-pnode')
+        self.playerPusher.addOutPattern('player-out-pnode')
+        self.playerPusher.addAgainPattern('player-again-pnode')
+        
         #self.accept('player-into-pnode', self.hitGround)
-        self.accept('player-into-pnode', self.physics.hitGround)
+        self.accept('player-in-pnode', self.physics.groundState, [True])
+        self.accept('player-out-pnode', self.physics.groundState, [False])
+        self.accept('player-again-pnode', self.physics.groundState, [True])
 
+        '''
+        self.fromObject = self.player.attachNewNode(CollisionNode('colNode'))
+        self.fromObject.node().addSolid(CollisionRay(0, 0, 0, 0, 0, -1))
         
-        taskMgr.add(self.falsify, "falsify_task", sort=29)
-    
-    def falsify(self, task):
-        self.physics.touchingGround = False
+        self.lifter = CollisionHandlerFloor()
+        self.lifter.addCollider(self.fromObject, self.player)
+        self.fromObject.show()
         
-        return Task.cont   
-    
+        self.cTrav = CollisionTraverser()
+        self.cTrav.addCollider(self.fromObject, self.lifter)
+        self.cTrav.showCollisions(self.render)
+        '''
+        print(self.player.getTightBounds())
+        
+    '''
     def hitGround(self, entry):
         print("touching ground")
         print(entry)
         self.player.touchingGround = True
         self.player.setZ(self.scene.model.getZ())
         self.physics.speed = 0
+    '''
     
+        
+        
 
-        
-        
-    def camera_pos(self, task):
-        x = str(round(self.camera.getX(), 3))
-        y = str(round(self.camera.getY(), 3))
-        z = str(round(self.camera.getZ(), 3))
-        
-        self.camera_pos_text.setText((f"Camera position: x{x} y{y} z{z}"))
-        return Task.cont
-    def player_pos(self, task):
-        x = str(round(self.player.getX(), 3))
-        y = str(round(self.player.getY(), 3))
-        z = str(round(self.player.getZ(), 3))
-        
-        self.player_pos_text.setText((f"Player position: x{x} y{y} z{z}"))
-        return Task.cont
-    def speed_text(self, task):
-        speed = str(round(self.physics.current_speed, 3))
-        self.player_speed_text.setText((f"Player speed: {speed}"))
-        print(self.physics.touchingGround)
-        return Task.cont
-    
 main = Main()
 main.run()
+

@@ -2,7 +2,7 @@
 from panda3d.core import ClockObject
 from direct.task import Task
 from .controls import Input
-
+from direct.showbase.PythonUtil import reduceAngle
 class Movement:
     def __init__(self):
         
@@ -14,20 +14,21 @@ class Movement:
         dt = ClockObject.getGlobalClock().getDt()
         
         if self.keyMap["left"]:
-            base.player.setH(base.player.getH() + dt * 60)
+            base.player.setH(reduceAngle(base.player.getH() + dt * 60))
         if self.keyMap["right"]:
-            base.player.setH(base.player.getH() - dt * 60)
+            base.player.setH(reduceAngle(base.player.getH() - dt * 60))
         if self.keyMap["forward"]:
             base.player.setY(base.player, - dt * 30)
         if self.keyMap["backward"]:
             base.player.setY(base.player, + dt * 15)
-        if self.keyMap["jump"] and base.physics.touchingGround:
-            #base.touchingGround = False
-            base.player.setZ(base.player.getZ() + dt * 100)
+        if self.keyMap["jump"]:
+            if base.physics.touching_ground:
+                base.physics.touching_ground = False
+                base.physics.current_speed = 2.5
+            if not base.physics.touching_ground:
+                base.physics.current_speed += base.physics.acceleration
+                base.player.setZ(base.player, base.physics.current_speed)
            
-            #base.player.setZ(base.player.getZ() + dt * 30)
-            #base.touchingGround = False
-            #print(ClockObject.getGlobalClock().getRealTime())
         
         if self.keyMap["forward"]:
             if not self.isMoving:
@@ -44,15 +45,16 @@ class Movement:
                 self.isMoving = False
         if self.keyMap["jump"]:
             if not self.isMoving:
-                base.player.setPlayRate(0.1, "Jump_ToIdle")
+                base.player.stop()
                 base.player.play("Jump_ToIdle")
                 self.isMoving = True
+            elif self.isMoving:
+                base.player.play("Gallop")
          
         
-        if base.player.getH() > 360:
-            base.player.setH(0)
-        if base.player.getH() < 0:
-            base.player.setH(360)
+        print(base.physics.touching_ground)
+        print(base.physics.current_speed)
+        print(base.physics.acceleration)
         return Task.cont
     
         
