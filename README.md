@@ -1,4 +1,4 @@
-[![Discord](https://badgen.net/discord/online-members/SPHS3WAnys)](https://discord.gg/SPHS3WAnys)
+![Discord](https://img.shields.io/discord/987538220411662376)
 
 # DogGame
 
