@@ -1,0 +1,3 @@
+panda3d==1.10.11
+panda3d-gltf
+panda3d-simplepbr
