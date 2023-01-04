@@ -17,9 +17,9 @@ from src.controls import Input
 from src.movement import Movement
 from src.physics import Physics
 
-# from panda3d.core import loadPrcFileData
-# loadPrcFileData("", "want-directtools #t")
-# loadPrcFileData("", "want-tk #t")
+from panda3d.core import loadPrcFileData
+#loadPrcFileData("", "want-directtools #t")
+#loadPrcFileData("", "want-tk #t")
 
 # Load settings
 loadPrcFile('settings.prc')
@@ -34,17 +34,16 @@ class Main(ShowBase):
         self.properties = WindowProperties()
         self.properties.setTitle("Dog!")
 
-        self.properties.setIconFilename('assets/textures/animal-dog.bmp')
+        self.properties.setIconFilename('assets/textures/animal-dog.ico')
         self.win.requestProperties(self.properties)
         
         # Patch loader to support gltf files
         gltf.patch_loader(self.loader)
 
         # Disables camera control via mouse (this is required for the camera position to be able to be adjusted in the code)
-        # self.disableMouse()
+        self.disableMouse()
         # simplepbr.init()
 
-        
         self.debug = Debug()
         self.scene = Level()
         self.player = Player()
@@ -56,16 +55,6 @@ class Main(ShowBase):
             "src/assets/sound/Sneaky Adventure.mp3")
         self.music.setVolume(0.1)
         # self.music.play()
-
-        # self.player2 = Player()
-
-        # Move second player to the right so it doesn't clip into first player
-        # self.player2.setPos(2, 0, 0)
-
-        # Animations for testing
-
-        # self.player2.loop("Gallop")
-
 
         # Create collision traverser
         self.cTrav = CollisionTraverser()
@@ -121,20 +110,7 @@ class Main(ShowBase):
 
         self.cTrav.addCollider(self.avatarRay, self.floorHandler)
         self.cTrav.addCollider(self.playerCollider, self.wallHandler)
-
-      
-        self.accept('h', print, [self.playerNP.getPos()])
-        
-        print(self.player.model.list_joints())
-        
-        # myNodePath = self.player.expose_joint(None, "modelRoot", "Head")
-        # ball = self.loader.loadModel("models/panda.egg.pz")
-        # ball.reparentTo(myNodePath)
-
-        # self.accept('p', print, [ball.getPos()])
-        #self.accept('j', self.playerNP.setZ, [1])
-        #self.accept('u', self.playerNP.setZ, [self.playerNP, 5])
-        #self.accept('l', lambda: print, [self.avatarRay.node().getOrigin()])
+    
         print(self.raygeometry.origin)
         self.avatarRay.show()
         self.cTrav.show_collisions(render)
@@ -160,7 +136,32 @@ class Main(ShowBase):
                 lf.start()
         self.accept("space", jump)
         print(self.player.model.get_anim_names())
-
+        #self.accept('v', lambda: print(base.cam) )
+        def camera_update(task):
+            self.camera.set_pos(self.playerNP, 0, -10, self.playerNP.get_z() + 16)
+            print(self.camera.get_pos())
+            self.camera.set_hpr(self.playerNP.get_h(), -45, 0)
+            return Task.cont
+        self.task_mgr.add(camera_update, 'cam_update')
+        #self.camera.set_pos(0, 0, 6)
+        #self.camera.set_hpr(-90)
+        #self.camera_2 = Camera("camera2")
+        #self.camera_node = self.render.attach_new_node(self.camera_2)
+        #self.camera_node.set_pos_hpr(0, 0, 16, 0, -90, 0)
+        #def switch():
+        #    base.win.getDisplayRegion(1).setCamera(self.camera_node)
+        #    print("switch")
+        #    print(base.win.getDisplayRegions())
+        #self.camera_node.reparent_to(base.camera)
+        #self.accept('x', switch)
+        #region = base.win.makeDisplayRegion()
+        #region = base.win.makeDisplayRegion(0.5, 1, 0, 1)
+        
+        #self.player.model.cleanup()
+        self.accept("1", self.player_spawn)
+        
+    def player_spawn(self):
+        self.playerNP.setPos(self.scene.spawn_point.getPos())
 
 main = Main()
 main.run()
