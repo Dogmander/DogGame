@@ -65,19 +65,19 @@ class Movement:
         dt = globalClock.getDt()
         moving = False
         if self.input.keyMap["left"]:
-            base.playerNP.setH(reduceAngle(base.playerNP.getH() + dt * base.player.SPEED_TURN))
+            base.player.playerNP.setH(reduceAngle(base.player.playerNP.getH() + dt * base.player.SPEED_TURN))
             moving = True
             
         if self.input.keyMap["right"]:
-            base.playerNP.setH(reduceAngle(base.playerNP.getH() - dt * base.player.SPEED_TURN))
+            base.player.playerNP.setH(reduceAngle(base.player.playerNP.getH() - dt * base.player.SPEED_TURN))
             moving = True
             
         if self.input.keyMap["forward"]:
-            base.playerNP.setY(base.playerNP, + dt * base.player.SPEED_FW)
+            base.player.playerNP.setY(base.player.playerNP, + dt * base.player.SPEED_FW)
             moving = True
             
         if self.input.keyMap["backward"]:
-            base.playerNP.setY(base.playerNP, - dt * base.player.SPEED_BW)
+            base.player.playerNP.setY(base.player.playerNP, - dt * base.player.SPEED_BW)
             moving = True
             
         if moving and self.fsm.state != 'Walk':
